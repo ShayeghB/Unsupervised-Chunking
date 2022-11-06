@@ -13,7 +13,9 @@ device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 #device = torch.device('cpu')
 
 def conll_eval(model, pred_path, BI_gt, iterator, criterion, bert_embed, test_msl, model_path):
-	
+	if not os.path.exists(pred_path):
+		open(pred_path, 'w').close()
+
 	if model_path:		
 		model.load_state_dict(torch.load(model_path, map_location=torch.device(device)))
 		print("------------->")
@@ -29,7 +31,7 @@ def conll_eval(model, pred_path, BI_gt, iterator, criterion, bert_embed, test_ms
 		iterator.create_batches()
 		with open(pred_path, 'a') as fp:
 			p = 0
-			for sample_id, batch in tqdm(enumerate(iterator.batches)):	
+			for sample_id, batch in enumerate(tqdm(iterator.batches)):	
 				tokens = torch.unsqueeze(batch[0][0], 0).long().to(device)
 				seqlens = torch.as_tensor(torch.count_nonzero(tokens, dim=-1), dtype=torch.int64, device='cpu')
 				tags = batch[0][1].to(device)

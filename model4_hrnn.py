@@ -49,17 +49,17 @@ BI_val_gt = pickle.load(open("data_conll/conll/data_val_tags.pkl", "rb"))
 
 
 # ##### initialize BERT model ####
-# bert_model = [BertModel, BertTokenizer, BertConfig, 'bert-large-cased']
-# training_data = training_data_ori
-# val_data = val_data_ori
-# test_data = test_data_ori
-
-training_data = training_data2
-val_data = training_data3
-test_data = training_data4
 bert_model = [BertModel, BertTokenizer, BertConfig, 'bert-large-cased']
-BI_val_gt = [['B','B','I','B', 'B', 'I' ], ['B','B','B']]
-BI_test_gt = [['B','B','B','I', 'I'], ['B','B','B']]
+training_data = training_data_ori
+val_data = val_data_ori
+test_data = test_data_ori
+
+# training_data = training_data2
+# val_data = training_data3
+# test_data = training_data4
+# bert_model = [BertModel, BertTokenizer, BertConfig, 'bert-large-cased']
+# BI_val_gt = [['B','B','I','B', 'B', 'I' ], ['B','B','B']]
+# BI_test_gt = [['B','B','B','I', 'I'], ['B','B','B']]
 
 class HRNNtagger(nn.ModuleList):
 
@@ -160,7 +160,7 @@ def train(model, optimizer, criterion, iterator, bert_embed, max_seq_len):
 	
 	iterator.create_batches()
 
-	for sample_id, batch in tqdm(enumerate(iterator.batches)):
+	for sample_id, batch in enumerate(tqdm(iterator.batches)):
 		tokens = batch[0][0].to(device)
 		tags = batch[0][1].to(device)
 		bert_sent = bert_embed[sample_id].to(device)

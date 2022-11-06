@@ -43,7 +43,7 @@ def compute_feat(model_disc, data_tokens, word_to_ix, ix_to_word, device, token_
     measure = Measure(n_layers, n_att)
     feat_sents = torch.zeros([len(data_tokens), len(data_tokens[0]), 1024]) 
 
-    for idx, s_tokens in tqdm(enumerate(data_tokens)):
+    for idx, s_tokens in enumerate(tqdm(data_tokens)):
         #################### read words and extract ##############
         
         s_tokens = [ix_to_word[ix] for ix in s_tokens.cpu().numpy()]

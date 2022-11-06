@@ -4,8 +4,9 @@ import pickle
 from sklearn.metrics import classification_report
 import collections
 
+parser = argparse.ArgumentParser()
 
-parser.add_argument('--train-test-val', default="train", type=int) # options: ["train", "val", "test"]
+parser.add_argument('--train-test-val', default="train", type=str) # options: ["train", "val", "test"]
 parser.add_argument('--dist-measure', default="avg_hellinger" , type=str)  # options = ['avg_hellinger', 'avg_jsd', 'l2', 'cos']
 parser.add_argument('--model', default="bert-base-cased" , type=str) # options = ['bert-base-cased', 'bert-base-german-cased']
 parser.add_argument('--dist-path', default="output_distances/train.pkl" , type=str) 	

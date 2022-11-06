@@ -136,7 +136,7 @@ def compute_dist(args):
                     syn_dists[m][i] = torch.FloatTensor(dist)
         
 
-            new_dist = syn_dists[dist_type].numpy()
+            new_dist = syn_dists[dist_type].cpu().numpy()
             syn_dists_sents.append(new_dist)
            
             ################ ################ ################ ################ ##########
