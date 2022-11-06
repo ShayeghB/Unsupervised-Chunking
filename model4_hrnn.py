@@ -28,7 +28,8 @@ from data_conll.conll_utils import build_w2v, build_vocab, convert_to_word
 #torch.autograd.set_detect_anomaly(True)
 
 
-EMBEDDING_DIM = 1024 # 768 base, 1024 large
+# EMBEDDING_DIM = 1024 # 768 base, 1024 large
+EMBEDDING_DIM = 300 # for bilingual
 HIDDEN_DIM = 100
 NUM_LAYERS = 1
 is_training = 0
