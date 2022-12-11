@@ -21,7 +21,7 @@ from subprocess import run, PIPE
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
-def build_vocab(t_data, v_data, test_data):
+def build_vocab(t_data, v_data=[], test_data=[]):
 	word_to_ix = {"PAD": 0, "UNK": 1, "SOS": 2, "EOS": 3}
 	net = []
 	for a,b in t_data:

@@ -37,7 +37,8 @@ def load_vec(emb_path):
     embeddings = np.vstack(vectors)
     return embeddings, id2word, word2id
 
-path = "./word_embeddings/vecmap-glove-fasttext-720000/SRC-EN.vec-718000.txt"
+# path = "./word_embeddings/vecmap-glove-fasttext-720000/SRC-EN.vec-718000.txt"
+path = "./word_embeddings/vecmap-glove-fasttext-720000/TGT-FA.vec-718000.txt"
 src_embeddings, src_id2word, src_word2id = load_vec(path)
 
 def compute_feat_from_file(data_tokens, word_to_ix, ix_to_word, device):
