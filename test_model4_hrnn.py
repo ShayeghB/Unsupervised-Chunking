@@ -24,7 +24,6 @@ def conll_eval(model, pred_path, BI_gt, iterator, criterion, bert_embed, test_ms
 	#####################################
 	print('[INFO] Generating a CONLL file.....')
 
-	hc = model.init_hidden().to(device)
 	loss_avg = 0.
 	total_time = 0.
 	with torch.no_grad():
@@ -32,6 +31,7 @@ def conll_eval(model, pred_path, BI_gt, iterator, criterion, bert_embed, test_ms
 		with open(pred_path, 'a') as fp:
 			p = 0
 			for sample_id, batch in enumerate(tqdm(iterator.batches)):	
+				hc = model.init_hidden().to(device)
 				tokens = torch.unsqueeze(batch[0][0], 0).long().to(device)
 				seqlens = torch.as_tensor(torch.count_nonzero(tokens, dim=-1), dtype=torch.int64, device='cpu')
 				tags = batch[0][1].to(device)

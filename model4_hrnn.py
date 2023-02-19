@@ -246,10 +246,17 @@ def main():
 		val_fscore_vec = []
 		best_fscore = 0.
 
+		print("[INFO] Valid procedure.....")	
+		pred_path_val_out = args.dire + 'validation/test_outputs_init.out'
+		loss_nimp = conll_eval(hrnn_model,  pred_path_val_out, BI_val_gt, val_iterator, loss_function, v_matrix, val_msl, model_path=None)
+		fscore = valid_conll_eval(pred_path_val_out)
+		print(f'\t Validation F score: {fscore:.3f}')
+
 		for epoch in range(NUM_ITER):  
 			start_time = time.time()
 			print("------------->")
-			print("[INFO] Training procedure.....")		
+			print("[INFO] Training procedure.....")
+			print("LR: ", scheduler.get_lr())		
 
 			train_loss = train(hrnn_model, optimizer, loss_function, train_iterator, matrix, train_msl)
 			
