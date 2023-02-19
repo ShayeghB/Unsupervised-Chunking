@@ -21,14 +21,15 @@ from torch.nn.utils.rnn import pack_padded_sequence
 from torch.nn.utils.rnn import pad_packed_sequence
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-#device = torch.device('cpu')
+# device = torch.device('cpu')
 
 from data_conll.conll_utils import epoch_time, valid_conll_eval, data_padding
 from data_conll.conll_utils import build_w2v, build_vocab, convert_to_word
 #torch.autograd.set_detect_anomaly(True)
 
 
-EMBEDDING_DIM = 1024 # 768 base, 1024 large
+# EMBEDDING_DIM = 1024 # 768 base, 1024 large
+EMBEDDING_DIM = 300 # for bilingual
 HIDDEN_DIM = 100
 NUM_LAYERS = 1
 is_training = 0
@@ -39,14 +40,21 @@ L_RATE = 0.001
 warmup = 50
 
 ##### load psuedo labels from compound pcfg model ####
-training_data_ori = pickle.load(open("data_conll/from_comppcfg/train_psuedo_data_hrnn_model.pkl", "rb"))
-val_data_ori = pickle.load(open("data_conll/from_comppcfg/val_psuedo_data_hrnn_model.pkl", "rb"))
-test_data_ori = pickle.load(open("data_conll/from_comppcfg/test_psuedo_data_hrnn_model.pkl", "rb"))
+# training_data_ori = pickle.load(open("data_conll/from_comppcfg/train_psuedo_data_hrnn_model.pkl", "rb"))
+# val_data_ori = pickle.load(open("data_conll/from_comppcfg/val_psuedo_data_hrnn_model.pkl", "rb"))
+# test_data_ori = pickle.load(open("data_conll/from_comppcfg/test_psuedo_data_hrnn_model.pkl", "rb"))
+
+training_data_ori = pickle.load(open("persian_data/persian_psuedo_data_hrnn_model_train.pickle", "rb"))
+val_data_ori = pickle.load(open("persian_data/persian_psuedo_data_hrnn_model_val.pickle", "rb"))
+test_data_ori = pickle.load(open("persian_data/persian_psuedo_data_hrnn_model_test.pickle", "rb"))
+
 
 ##### load test and val set ####
-BI_test_gt = pickle.load(open("data_conll/conll/data_test_tags.pkl", "rb"))
-BI_val_gt = pickle.load(open("data_conll/conll/data_val_tags.pkl", "rb"))
+# BI_test_gt = pickle.load(open("data_conll/conll/data_test_tags.pkl", "rb"))
+# BI_val_gt = pickle.load(open("data_conll/conll/data_val_tags.pkl", "rb"))
 
+BI_test_gt = pickle.load(open("persian_data/persian_test_tags.pickle", "rb"))
+BI_val_gt = pickle.load(open("persian_data/persian_val_tags.pickle", "rb"))
 
 # ##### initialize BERT model ####
 bert_model = [BertModel, BertTokenizer, BertConfig, 'bert-large-cased']
@@ -189,8 +197,11 @@ def main():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--is-training', default=1, type=int) 
 	parser.add_argument('--dire', default="save_files/" , type=str) 	
+	parser.add_argument('--model', default=None , type=str) 	
 	args = parser.parse_args()
-	best_model_path = args.dire + 'best-model-hrnn.pt'
+	# best_model_path = args.dire + 'best-model-hrnn.pt'
+	# best_model_path = args.dire + 'best-model-hrnn-finetuned.pt'
+	best_model_path = args.dire + 'per2-started-best-model-hrnn-finetuned.pt'
 	pred_path_test_out = 'best_test.txt'
 	opt_path = args.dire + 'sgd.opt'
 	
@@ -246,11 +257,14 @@ def main():
 		val_fscore_vec = []
 		best_fscore = 0.
 
-		print("[INFO] Valid procedure.....")	
-		pred_path_val_out = args.dire + 'validation/test_outputs_init.out'
-		loss_nimp = conll_eval(hrnn_model,  pred_path_val_out, BI_val_gt, val_iterator, loss_function, v_matrix, val_msl, model_path=None)
-		fscore = valid_conll_eval(pred_path_val_out)
-		print(f'\t Validation F score: {fscore:.3f}')
+		if args.model:		
+			hrnn_model.load_state_dict(torch.load(args.model, map_location=torch.device(device)))
+			print("------------->")
+			print("[INFO] Model is loaded...")
+			print("[INFO] Valid procedure.....")	
+			pred_path_val_out = args.dire + 'validation/test_outputs' + '-pre-trained' + '.out'
+			loss_nimp = conll_eval(hrnn_model,  pred_path_val_out, BI_val_gt, val_iterator, loss_function, v_matrix, val_msl, model_path=None)
+			fscore = valid_conll_eval(pred_path_val_out)
 
 		for epoch in range(NUM_ITER):  
 			start_time = time.time()

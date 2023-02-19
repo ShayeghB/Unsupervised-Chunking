@@ -125,7 +125,7 @@ for dist_type in dist_types:
 			BI_pred = np.array(BI_pred)
 			print("len BI pred", len(BI_pred))
 			print("len BI gt", len(BI_gt))
-			pred_path = f'output_distances/{data_type}-{dist_type}-{i}.out'
+			pred_path = f'my_results/output_distances/{data_type}-{dist_type}-{i}.out'
 			fc = 0
 			with open(pred_path, 'a') as fp:
 				for p in range(len(BI_pred)):

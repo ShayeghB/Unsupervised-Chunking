@@ -14,10 +14,41 @@ from utils.parser import not_coo_parser, parser
 from utils.tools import set_seed, select_indices, group_indices
 from utils.yk import get_actions, get_nonbinary_spans
 
+import io
 
-device = torch.device('cuda:1' if torch.cuda.is_available() else 'cpu')
+# device = torch.device('cuda:1' if torch.cuda.is_available() else 'cpu')
 
 def compute_feat(model_disc, data_tokens, word_to_ix, ix_to_word, device, token_heuristic="mean"):
+    # return compute_feat_by_bert(model_disc, data_tokens, word_to_ix, ix_to_word, device, token_heuristic)
+    return compute_feat_from_file(data_tokens, word_to_ix, ix_to_word, device)
+
+def load_vec(emb_path):
+    vectors = []
+    word2id = {}
+    with io.open(emb_path, 'r', encoding='utf-8', newline='\n', errors='ignore') as f:
+        next(f)
+        for i, line in enumerate(f):
+            word, vect = line.rstrip().split(' ', 1)
+            vect = np.fromstring(vect, sep=' ')
+            assert word not in word2id, 'word found twice'
+            vectors.append(vect)
+            word2id[word] = len(word2id)
+    id2word = {v: k for k, v in word2id.items()}
+    embeddings = np.vstack(vectors)
+    return embeddings, id2word, word2id
+
+# path = "./word_embeddings/vecmap-glove-fasttext-720000/SRC-EN.vec-718000.txt"
+path = "./word_embeddings/vecmap-glove-fasttext-720000/TGT-FA.vec-718000.txt"
+src_embeddings, src_id2word, src_word2id = load_vec(path)
+
+def compute_feat_from_file(data_tokens, word_to_ix, ix_to_word, device):
+    feat_sents = []
+    for idx, s_tokens in enumerate(tqdm(data_tokens)):
+        feat_sents.append([src_embeddings[src_word2id.get(ix_to_word[ix], src_word2id['UNK'])].tolist() for ix in s_tokens.cpu().numpy()])
+    feat_sents = torch.as_tensor(feat_sents)
+    return feat_sents
+
+def compute_feat_by_bert(model_disc, data_tokens, word_to_ix, ix_to_word, device, token_heuristic="mean"):
     scores = dict()
     syn_dists_all = dict()
     max_seq_len = 0
@@ -92,11 +123,3 @@ def compute_feat(model_disc, data_tokens, word_to_ix, ix_to_word, device, token_
         feat_sents[idx] = all_hidden	
     
     return feat_sents
-
-
-
-
-
-
-
-
